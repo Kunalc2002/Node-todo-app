@@ -1,27 +1,37 @@
 pipeline {
-    agent { label 'node-agent' }
+    agent any
     
-    stages{
-        stage('Code'){
-            steps{
-                git url: 'https://github.com/LondheShubham153/node-todo-cicd.git', branch: 'master' 
+    stages {
+        stage('Code') {
+            steps {
+                echo "Cloning GitHub repo"
+                git url: 'https://github.com/kaif-alam-46/node-todo-cicd.git', branch: 'master'
             }
         }
-        stage('Build and Test'){
-            steps{
-                sh 'docker build . -t trainwithshubham/node-todo-test:latest'
+
+        stage('Build') {
+            steps {
+                sh 'docker build . -t kaifalam46/node-todo-test:latest'
             }
         }
-        stage('Push'){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        	     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-                 sh 'docker push trainwithshubham/node-todo-test:latest'
+
+        stage('Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    sh 'docker push kaifalam46/node-todo-test:latest'
                 }
             }
         }
-        stage('Deploy'){
-            steps{
+
+        stage('Test') {
+            steps {
+                echo "Testing the new build..."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
                 sh "docker-compose down && docker-compose up -d"
             }
         }

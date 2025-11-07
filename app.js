@@ -80,7 +80,7 @@ app.get('/todo', function (req, res) {
         res.redirect('/todo');
     })
 
-    .listen(port, function () {
+    .listen(port,'0.0.0.0',function () {
         // Logging to console
         console.log(`Todolist running on http://0.0.0.0:${port}`)
     });
